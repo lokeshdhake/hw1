@@ -27,8 +27,7 @@ def get_shape(X: np.ndarray) -> Tuple[int, int]:
     n_features : int
     """
     # TODO: replace with your implementation
-    raise NotImplementedError
-
+    return X.shape
 
 def feature_histograms(X: np.ndarray, bins: int = 10) -> List[Tuple[np.ndarray, np.ndarray]]:
     """
@@ -48,7 +47,11 @@ def feature_histograms(X: np.ndarray, bins: int = 10) -> List[Tuple[np.ndarray, 
         (hist, bin_edges) as returned by np.histogram for that feature.
     """
     # TODO: replace with your implementation
-    raise NotImplementedError
+    histograms = []
+    for i in range(X.shape[1]):
+        hist,bin_edges = np.histogram(X[:,i], bins = bins)
+        histograms.append((hist,bin_edges))
+    return histograms
 
 
 def compute_stats(X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -68,7 +71,9 @@ def compute_stats(X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         1D array of shape (n_features,) with feature standard deviations.
     """
     # TODO: replace with your implementation
-    raise NotImplementedError
+    means = np.mean(X,axis=0)
+    stds = np.std(X,axis=0)
+    return means,stds
 
 
 def scatter_pairs(
@@ -99,7 +104,16 @@ def scatter_pairs(
         containing the selected feature values.
     """
     # TODO: replace with your implementation
-    raise NotImplementedError
+    result = {}
+    classes = np.unique(y)
+
+    for(i,j) in feature_pairs:
+        result[(i,j)]={}
+        for c in classes:
+            X_c = X[y==c]
+            points = np.column_stack((X_c[:,i],X_c[:,j]))
+            result[(i,j)][c] = points
+    return result
 
 
 def _load_iris() -> Tuple[np.ndarray, np.ndarray]:
@@ -133,34 +147,19 @@ def main(argv: List[str] = None) -> int:
 
     X, y = _load_iris()
 
-    # get_shape
-    try:
-        n_samples, n_features = get_shape(X)
-        print(f"get_shape: n_samples={n_samples}, n_features={n_features}")
-    except NotImplementedError:
-        print("get_shape: NotImplemented")
+    X, y = _load_iris()
 
-    # feature_histograms
-    try:
-        n_bins = 10
-        hists = feature_histograms(X, bins=n_bins)
-        print(f"feature_histograms: computed {len(hists)} histograms with bins={n_bins}")
-    except NotImplementedError:
-        print("feature_histograms: NotImplemented")
+    n_samples, n_features = get_shape(X)
+    print(f"get_shape: n_samples={n_samples}, n_features={n_features}")
 
-    # compute_stats
-    try:
-        means, stds = compute_stats(X)
-        print(f"compute_stats: means.shape={means.shape}, stds.shape={stds.shape}")
-    except NotImplementedError:
-        print("compute_stats: NotImplemented")
+    hists = feature_histograms(X, bins=10)
+    print(f"feature_histograms: computed {len(hists)} histograms")
 
-    # scatter_pairs
-    try:
-        result = scatter_pairs(X, y)
-        print(f"scatter_pairs: prepared {len(result)} feature pair groups")
-    except NotImplementedError:
-        print("scatter_pairs: NotImplemented")
+    means, stds = compute_stats(X)
+    print(f"compute_stats: means.shape={means.shape}, stds.shape={stds.shape}")
+
+    result = scatter_pairs(X, y)
+    print(f"scatter_pairs: prepared {len(result)} feature pair groups")
 
     return 0
 
